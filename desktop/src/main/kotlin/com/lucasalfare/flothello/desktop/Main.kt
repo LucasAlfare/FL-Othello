@@ -51,7 +51,7 @@ fun GameBoard() {
     var affected by remember { mutableStateOf<List<Pair<Int, Int>>>(emptyList()) }
 
     LaunchedEffect(game) {
-      if (game.isGameOver()) {
+      if (game.gameFinished) {
         val whiteResult = game.board.numWhite()
         val blackResult = game.board.numBlack()
         val winner = if (whiteResult > blackResult) "White" else if (whiteResult < blackResult) "Black" else "No one"
