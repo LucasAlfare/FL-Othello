@@ -28,9 +28,7 @@ import com.lucasalfare.flothello.core.Game
 
 fun main() = application {
   Window(
-    state = WindowState(
-      position = WindowPosition(Alignment.Center)
-    ),
+    state = WindowState(position = WindowPosition(Alignment.Center)),
     onCloseRequest = { exitApplication() }
   ) {
     GameBoard()
@@ -39,12 +37,7 @@ fun main() = application {
 
 @Composable
 fun GameBoard() {
-  Column(
-    modifier = Modifier
-      .padding(4.dp)
-      .background(Color.DarkGray)
-  ) {
-    // está tudo bem essa variável ficar aqui? Ela deveria ficar em outro lugar? Exemplo: no componente pai? Sei lá, só uma dúvida mesmo.
+  Column(modifier = Modifier.padding(4.dp).background(Color.DarkGray)) {
     var game by remember {
       mutableStateOf(
         Game(
@@ -56,6 +49,15 @@ fun GameBoard() {
     }
 
     var affected by remember { mutableStateOf<List<Pair<Int, Int>>>(emptyList()) }
+
+    LaunchedEffect(game) {
+      if (game.isGameOver()) {
+        val whiteResult = game.board.numWhite()
+        val blackResult = game.board.numBlack()
+        val winner = if (whiteResult > blackResult) "White" else if (whiteResult < blackResult) "Black" else "No one"
+        println("Game is over! $winner won!!! Results: w=$whiteResult, b=$blackResult")
+      }
+    }
 
     repeat(Constants.BOARD_SIZE) { y: Int ->
       Row {
@@ -75,12 +77,10 @@ fun GameBoard() {
             onClick = {
               affected = emptyList()
               game = game.step(x, y)
-              println("black: ${game.board.numBlack()}, white: ${game.board.numWhite()}")
             },
             onAnimationEnd = {
               if (game.currentRoundColor != game.userColor) {
                 affected = emptyList()
-                // essa estratégia aqui é horrível?
                 game = game.step(-1, -1) // forces step to make AI to play
               }
             }
