@@ -22,135 +22,262 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
-import com.lucasalfare.flothello.core.Board
-import com.lucasalfare.flothello.core.Constants
-import com.lucasalfare.flothello.core.Game
 
-fun main() = application {
-  Window(
-    state = WindowState(position = WindowPosition(Alignment.Center)),
-    onCloseRequest = { exitApplication() }
-  ) {
-    GameBoard()
-  }
-}
+//val board = Board()
+//val human = HumanPlayer(Constants.BLACK)
+//val ai = AIPlayer(Constants.WHITE, Constants.AUTOMATIC_MOVE_EASY)
+//val players = listOf(human, ai)
+//val game = GameController(board, human, players)
+//
+//fun main() = application {
+//  Window(
+//    state = WindowState(position = WindowPosition(Alignment.Center)),
+//    onCloseRequest = { exitApplication() }
+//  ) {
+//    GameBoard()
+//  }
+//}
+//
+//@Composable
+//fun GameBoard() {
+//  Column(modifier = Modifier.padding(4.dp).background(Color.DarkGray)) {
+//    var gameState by remember { mutableStateOf(game.getCurrentState()) }
+//    var affected by remember { mutableStateOf<List<Pair<Int, Int>>>(emptyList()) }
+//
+//    LaunchedEffect(Unit) {
+//      game.onUpdate = { state ->
+//        gameState = state
+//      }
+//    }
+//
+//    LaunchedEffect(gameState) {
+//      if (gameState.isOver) {
+//        println("isOver() true")
+//      }
+//    }
+//
+//    repeat(Constants.BOARD_SIZE) { y: Int ->
+//      Row {
+//        repeat(Constants.BOARD_SIZE) { x: Int ->
+//          val value = gameState.board.get(x, y)
+//          val isAffected = (x to y) in affected
+//
+//          GameBoardCell(
+//            value = value,
+//            affected = isAffected,
+//            onHover = {
+//              affected = gameState.board.getAffectedCoordinates(gameState.currentPlayer.color, x, y)
+//            },
+//            onExit = {
+//              affected = emptyList()
+//            },
+//            onClick = {
+//              affected = emptyList()
+//              human.inputProvider = { x to y }
+//              game.next()
+//            },
+//            onAnimationEnd = {
+//              if (gameState.currentPlayer is AIPlayer) {
+//                affected = emptyList()
+//                game.next()
+//              }
+//            }
+//          )
+//        }
+//      }
+//    }
+//  }
+//}
+//
+//@Composable
+//fun GameBoardCell(
+//  value: Int,
+//  affected: Boolean = false,
+//  onHover: () -> Unit = {},
+//  onExit: () -> Unit = {},
+//  onClick: () -> Unit = {},
+//  onAnimationEnd: () -> Unit = {}
+//) {
+//  val discColor = when (value) {
+//    Constants.BLACK -> Color.Black
+//    Constants.WHITE -> Color.White
+//    else -> null
+//  }
+//
+//  val affectedColor = if (affected) Color(0xFF8899cc) else Color(0xFF1bb380)
+//
+//  val scale = remember { Animatable(0f) }
+//
+//  LaunchedEffect(value) {
+//    if (discColor != null) {
+//      scale.snapTo(0f)
+//      scale.animateTo(
+//        targetValue = 1f,
+//        animationSpec = tween(durationMillis = 500)
+//      )
+//      onAnimationEnd()
+//    }
+//  }
+//
+//  Box(
+//    modifier = Modifier
+//      .size(40.dp)
+//      .pointerMoveFilter(
+//        onEnter = {
+//          onHover()
+//          false
+//        },
+//        onExit = {
+//          onExit()
+//          false
+//        }
+//      )
+//      .border(1.dp, Color(0xFF636363), RoundedCornerShape(4.dp))
+//      .padding(1.dp)
+//      .background(affectedColor)
+//      .clickable { onClick() },
+//    contentAlignment = Alignment.Center
+//  ) {
+//    if (discColor != null) {
+//      Canvas(
+//        modifier = Modifier
+//          .size(24.dp)
+//          .graphicsLayer(
+//            scaleX = scale.value,
+//            scaleY = scale.value
+//          )
+//      ) {
+//        drawCircle(color = discColor)
+//      }
+//    }
+//  }
+//}
 
-@Composable
-fun GameBoard() {
-  Column(modifier = Modifier.padding(4.dp).background(Color.DarkGray)) {
-    var game by remember {
-      mutableStateOf(
-        Game(
-          userColor = Constants.BLACK,
-          userStarts = true,
-          board = Board()
-        )
-      )
-    }
-
-    var affected by remember { mutableStateOf<List<Pair<Int, Int>>>(emptyList()) }
-
-    LaunchedEffect(game) {
-      if (game.gameFinished) {
-        val whiteResult = game.board.numWhite()
-        val blackResult = game.board.numBlack()
-        val winner = if (whiteResult > blackResult) "White" else if (whiteResult < blackResult) "Black" else "No one"
-        println("Game is over! $winner won!!! Results: w=$whiteResult, b=$blackResult")
-      }
-    }
-
-    repeat(Constants.BOARD_SIZE) { y: Int ->
-      Row {
-        repeat(Constants.BOARD_SIZE) { x: Int ->
-          val value = game.board.get(x, y)
-          val isAffected = (x to y) in affected
-
-          GameBoardCell(
-            value = value,
-            affected = isAffected,
-            onHover = {
-              affected = game.board.getAffectedCoordinates(Constants.BLACK, x, y)
-            },
-            onExit = {
-              affected = emptyList()
-            },
-            onClick = {
-              affected = emptyList()
-              game = game.step(x, y)
-            },
-            onAnimationEnd = {
-              if (game.currentRoundColor != game.userColor) {
-                affected = emptyList()
-                game = game.step(-1, -1) // forces step to make AI to play
-              }
-            }
-          )
-        }
-      }
-    }
-  }
-}
-
-@Composable
-fun GameBoardCell(
-  value: Int,
-  affected: Boolean = false,
-  onHover: () -> Unit = {},
-  onExit: () -> Unit = {},
-  onClick: () -> Unit = {},
-  onAnimationEnd: () -> Unit = {}
-) {
-  val discColor = when (value) {
-    Constants.BLACK -> Color.Black
-    Constants.WHITE -> Color.White
-    else -> null
-  }
-
-  val affectedColor = if (affected) Color(0xFF8899cc) else Color(0xFF1bb380)
-
-  val scale = remember { Animatable(0f) }
-
-  LaunchedEffect(value) {
-    if (discColor != null) {
-      scale.snapTo(0f)
-      scale.animateTo(
-        targetValue = 1f,
-        animationSpec = tween(durationMillis = 500)
-      )
-      onAnimationEnd()
-    }
-  }
-
-  Box(
-    modifier = Modifier
-      .size(40.dp)
-      .pointerMoveFilter(
-        onEnter = {
-          onHover()
-          false
-        },
-        onExit = {
-          onExit()
-          false
-        }
-      )
-      .border(1.dp, Color(0xFF636363), RoundedCornerShape(4.dp))
-      .padding(1.dp)
-      .background(affectedColor)
-      .clickable { onClick() },
-    contentAlignment = Alignment.Center
-  ) {
-    if (discColor != null) {
-      Canvas(
-        modifier = Modifier
-          .size(24.dp)
-          .graphicsLayer(
-            scaleX = scale.value,
-            scaleY = scale.value
-          )
-      ) {
-        drawCircle(color = discColor)
-      }
-    }
-  }
-}
+//fun main() = application {
+//  Window(
+//    state = WindowState(position = WindowPosition(Alignment.Center)),
+//    onCloseRequest = { exitApplication() }
+//  ) {
+//    GameBoard()
+//  }
+//}
+//
+//@Composable
+//fun GameBoard() {
+//  Column(modifier = Modifier.padding(4.dp).background(Color.DarkGray)) {
+//    var game by remember {
+//      mutableStateOf(
+//        Game(
+//          userColor = Constants.BLACK,
+//          userStarts = true,
+//          board = Board()
+//        )
+//      )
+//    }
+//
+//    var affected by remember { mutableStateOf<List<Pair<Int, Int>>>(emptyList()) }
+//
+//    LaunchedEffect(game) {
+//      if (game.gameFinished) {
+//        val whiteResult = game.board.numWhite()
+//        val blackResult = game.board.numBlack()
+//        val winner = if (whiteResult > blackResult) "White" else if (whiteResult < blackResult) "Black" else "No one"
+//        println("Game is over! $winner won!!! Results: w=$whiteResult, b=$blackResult")
+//      }
+//    }
+//
+//    repeat(Constants.BOARD_SIZE) { y: Int ->
+//      Row {
+//        repeat(Constants.BOARD_SIZE) { x: Int ->
+//          val value = game.board.get(x, y)
+//          val isAffected = (x to y) in affected
+//
+//          GameBoardCell(
+//            value = value,
+//            affected = isAffected,
+//            onHover = {
+//              affected = game.board.getAffectedCoordinates(Constants.BLACK, x, y)
+//            },
+//            onExit = {
+//              affected = emptyList()
+//            },
+//            onClick = {
+//              affected = emptyList()
+//              game = game.step(x, y)
+//            },
+//            onAnimationEnd = {
+//              if (game.currentRoundColor != game.userColor) {
+//                affected = emptyList()
+//                game = game.step(-1, -1) // forces step to make AI to play
+//              }
+//            }
+//          )
+//        }
+//      }
+//    }
+//  }
+//}
+//
+//@Composable
+//fun GameBoardCell(
+//  value: Int,
+//  affected: Boolean = false,
+//  onHover: () -> Unit = {},
+//  onExit: () -> Unit = {},
+//  onClick: () -> Unit = {},
+//  onAnimationEnd: () -> Unit = {}
+//) {
+//  val discColor = when (value) {
+//    Constants.BLACK -> Color.Black
+//    Constants.WHITE -> Color.White
+//    else -> null
+//  }
+//
+//  val affectedColor = if (affected) Color(0xFF8899cc) else Color(0xFF1bb380)
+//
+//  val scale = remember { Animatable(0f) }
+//
+//  LaunchedEffect(value) {
+//    if (discColor != null) {
+//      scale.snapTo(0f)
+//      scale.animateTo(
+//        targetValue = 1f,
+//        animationSpec = tween(durationMillis = 500)
+//      )
+//      onAnimationEnd()
+//    }
+//  }
+//
+//  Box(
+//    modifier = Modifier
+//      .size(40.dp)
+//      .pointerMoveFilter(
+//        onEnter = {
+//          onHover()
+//          false
+//        },
+//        onExit = {
+//          onExit()
+//          false
+//        }
+//      )
+//      .border(1.dp, Color(0xFF636363), RoundedCornerShape(4.dp))
+//      .padding(1.dp)
+//      .background(affectedColor)
+//      .clickable { onClick() },
+//    contentAlignment = Alignment.Center
+//  ) {
+//    if (discColor != null) {
+//      Canvas(
+//        modifier = Modifier
+//          .size(24.dp)
+//          .graphicsLayer(
+//            scaleX = scale.value,
+//            scaleY = scale.value
+//          )
+//      ) {
+//        drawCircle(color = discColor)
+//      }
+//    }
+//  }
+//}
