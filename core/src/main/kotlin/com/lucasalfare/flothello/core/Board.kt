@@ -1,24 +1,14 @@
+@file:Suppress("ArrayInDataClass")
+
 package com.lucasalfare.flothello.core
 
-object Board {
-
-  val pieces = Array(BOARD_SIZE * BOARD_SIZE) { Piece.Empty }
+data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Piece.Empty }) {
 
   init {
     set(Piece.Black, 3, 3)
     set(Piece.White, 4, 3)
     set(Piece.White, 3, 4)
     set(Piece.Black, 4, 4)
-
-//    set(Piece.Black, 1, 2)
-//    set(Piece.Black, 2, 2)
-
-//    set(Piece.White, 4, 2)
-//    set(Piece.White, 4, 3)
-//    set(Piece.Black, 4, 4)
-//    set(Piece.White, 3, 2)
-//    set(Piece.White, 2, 3)
-//    set(Piece.Black, 1, 4)
   }
 
   fun applyMove(piece: Piece, x: Int, y: Int): Boolean {
@@ -33,6 +23,24 @@ object Board {
     affectedPositions.forEach { set(piece, it.first, it.second) }
 
     return true
+  }
+
+  fun isValidMove(piece: Piece, x: Int, y: Int): Boolean {
+    return inBounds(x, y) &&
+            get(x, y) == Piece.Empty &&
+            findAffectedPositions(piece, x, y).isNotEmpty()
+  }
+
+  fun getValidMoves(piece: Piece): List<Pair<Int, Int>> {
+    val moves = mutableListOf<Pair<Int, Int>>()
+    for (y in 0 until BOARD_SIZE) {
+      for (x in 0 until BOARD_SIZE) {
+        if (isValidMove(piece, x, y)) {
+          moves.add(x to y)
+        }
+      }
+    }
+    return moves
   }
 
   /**
@@ -112,16 +120,12 @@ object Board {
     return (x in 0 until BOARD_SIZE) && (y in 0 until BOARD_SIZE)
   }
 
+  fun copy(): Board = Board(pieces = pieces.copyOf())
+
   override fun toString(): String = buildString {
     pieces.forEachIndexed { i, p ->
       if (i % BOARD_SIZE == 0) append("\n")
       append("${p.sign} ")
     }
   }
-}
-
-fun main() {
-  println(Board)
-  println(Board.applyMove(Piece.White, 0, 2))
-  println(Board)
 }

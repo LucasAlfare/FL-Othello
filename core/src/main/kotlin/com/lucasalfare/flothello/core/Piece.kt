@@ -13,4 +13,3 @@ enum class Piece(val sign: String) {
     else -> Invalid
   }
 }
-
