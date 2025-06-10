@@ -5,32 +5,26 @@ package com.lucasalfare.flothello.core
 data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Piece.Empty }) {
 
   init {
-    set(Piece.Black, 3, 3)
-    set(Piece.White, 4, 3)
-    set(Piece.White, 3, 4)
-    set(Piece.Black, 4, 4)
+    if (pieces.all { it == Piece.Empty }) {
+      set(Piece.Black, 3, 3)
+      set(Piece.White, 4, 3)
+      set(Piece.White, 3, 4)
+      set(Piece.Black, 4, 4)
+    }
   }
 
   fun applyMove(piece: Piece, x: Int, y: Int): Boolean {
-    if (!inBounds(x, y)) return false
-
     val affectedPositions = findAffectedPositions(piece, x, y)
-    if (affectedPositions.isEmpty()) {
-      println("no pieces affected by this ${x to y} move.")
-      return false
-    }
+    if (affectedPositions.isEmpty()) return false
 
     set(piece, x, y)
     affectedPositions.forEach { set(piece, it.first, it.second) }
-
     return true
   }
 
-  fun isValidMove(piece: Piece, x: Int, y: Int): Boolean {
-    return inBounds(x, y) &&
-            get(x, y) == Piece.Empty &&
-            findAffectedPositions(piece, x, y).isNotEmpty()
-  }
+  fun isValidMove(piece: Piece, x: Int, y: Int): Boolean = inBounds(x, y) &&
+          get(x, y) == Piece.Empty &&
+          findAffectedPositions(piece, x, y).isNotEmpty()
 
   fun getValidMoves(piece: Piece): List<Pair<Int, Int>> {
     val moves = mutableListOf<Pair<Int, Int>>()
@@ -51,24 +45,21 @@ data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Pie
       return emptyList()
     }
 
-    for (yDirectionFactor in -1..1) {
-      for (xDirectionFactor in -1..1) {
+    for (yDir in -1..1) {
+      for (xDir in -1..1) {
         // skips center, because center is the played position itself!
-        if (!(xDirectionFactor == 0 && yDirectionFactor == 0)) {
-          if (get(x + xDirectionFactor, y + yDirectionFactor) == piece.opposite()) {
+        if (!(xDir == 0 && yDir == 0)) {
+          if (get(x + xDir, y + yDir) == piece.opposite()) {
             val searches = exploreDirection(
               piece = piece,
-              startingExplorationX = x + xDirectionFactor,
-              startingExplorationY = y + yDirectionFactor,
-              xDirectionFactor = xDirectionFactor,
-              yDirectionFactor = yDirectionFactor
+              startingExplorationX = x + xDir,
+              startingExplorationY = y + yDir,
+              xDir = xDir,
+              yDir = yDir
             )
-//            println("Affected positions for ${x to y}: $searches")
 
-            searches.forEach { s ->
-              if (!affected.contains(s)) {
-                affected.add(s)
-              }
+            if (searches.isNotEmpty()) {
+              affected.addAll(searches)
             }
           }
         }
@@ -78,29 +69,28 @@ data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Pie
     return affected
   }
 
-  private fun exploreDirection(
+  internal fun exploreDirection(
     piece: Piece,
     startingExplorationX: Int,
     startingExplorationY: Int,
-    xDirectionFactor: Int,
-    yDirectionFactor: Int
-  ): MutableList<Pair<Int, Int>> {
+    xDir: Int,
+    yDir: Int
+  ): List<Pair<Int, Int>> {
     val searches = mutableListOf<Pair<Int, Int>>()
-    var nextX = startingExplorationX
-    var nextY = startingExplorationY
-    while (true) {
-      val current = get(nextX, nextY)
-
-      when (current) {
-        Piece.Invalid, Piece.Empty -> return mutableListOf()
+    var x = startingExplorationX
+    var y = startingExplorationY
+    while (inBounds(x, y)) {
+      when (get(x, y)) {
+        piece.opposite() -> searches.add(x to y)
         piece -> return searches
-        piece.opposite() -> searches += nextX to nextY
-        else -> {}
+        else -> return emptyList()
       }
 
-      nextX += xDirectionFactor
-      nextY += yDirectionFactor
+      x += xDir
+      y += yDir
     }
+
+    return emptyList()
   }
 
   fun get(x: Int, y: Int): Piece {

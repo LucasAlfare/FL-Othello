@@ -15,19 +15,14 @@ class Game(
     val gameStatus = if (hasMoves) GameStatus.Playing else GameStatus.FinishedByNoMoves
 
     val nextBoard = gameState.board.deepCopy()
+    val moved = if (gameStatus == GameStatus.Playing) currentPlayer.doMove(nextBoard) else false
 
-    return if (gameStatus == GameStatus.Playing && currentPlayer.doMove(nextBoard)) {
-      gameState = gameState.copy(
-        board = nextBoard,
-        round = gameState.round + 1,
-        gameStatus = gameStatus
-      )
-      onChangeState.invoke(gameState)
-      true
-    } else {
-      gameState = gameState.copy(round = gameState.round + 1, gameStatus = gameStatus)
-      onChangeState.invoke(gameState)
-      false
-    }
+    gameState = gameState.copy(
+      board = if (moved) nextBoard else gameState.board,
+      round = gameState.round + 1,
+      gameStatus = gameStatus
+    )
+    onChangeState.invoke(gameState)
+    return moved
   }
 }

@@ -14,16 +14,11 @@ fun main() {
 
   println(board)
 
-//  while (true) {
-//    Scanner(System.`in`).nextLine()
-//    game.step()
-//  }
-
   repeat(19) {
     game.step()
   }
 
-  // até o round "19" funciona, todas as jogadas dão certinhas, mas quando faço o próximo step aí por algum motivo ele joga em White em [2, 3]!
+  // até o round "19" funciona, todas as jogadas dão certinhas, mas quando este próximo step, por algum motivo, ele joga White[2, 3]!
   game.step()
 }
 
