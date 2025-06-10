@@ -16,6 +16,7 @@ data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Pie
 
     val affectedPositions = findAffectedPositions(piece, x, y)
     if (affectedPositions.isEmpty()) {
+      println("no pieces affected by this ${x to y} move.")
       return false
     }
 
@@ -43,16 +44,6 @@ data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Pie
     return moves
   }
 
-  /**
-   * This function is used to get all affected positions if a [piece] (colored item) is placed at
-   * [[x], [y]].
-   *
-   * If the coords are invalid for any kind of possible restrictions (or out of board bounds),
-   * `emptyList()` is returned.
-   *
-   * The returned result of this function is a list of pairs of integers, such as:
-   * - `[(3, 2), (2, 3), (4, 2), (4, 3)]`.
-   */
   fun findAffectedPositions(piece: Piece, x: Int, y: Int): List<Pair<Int, Int>> {
     val affected = mutableListOf<Pair<Int, Int>>()
 
@@ -72,7 +63,13 @@ data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Pie
               xDirectionFactor = xDirectionFactor,
               yDirectionFactor = yDirectionFactor
             )
-            affected.addAll(searches)
+//            println("Affected positions for ${x to y}: $searches")
+
+            searches.forEach { s ->
+              if (!affected.contains(s)) {
+                affected.add(s)
+              }
+            }
           }
         }
       }
@@ -120,12 +117,37 @@ data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Pie
     return (x in 0 until BOARD_SIZE) && (y in 0 until BOARD_SIZE)
   }
 
-  fun copy(): Board = Board(pieces = pieces.copyOf())
+  fun deepCopy(): Board = Board(pieces.copyOf())
 
   override fun toString(): String = buildString {
-    pieces.forEachIndexed { i, p ->
-      if (i % BOARD_SIZE == 0) append("\n")
-      append("${p.sign} ")
+    appendLine()
+    for (y in 0 until BOARD_SIZE) {
+      append("$y ".padStart(3))
+      for (x in 0 until BOARD_SIZE) {
+        append("${get(x, y).sign}|")
+      }
+      appendLine()
     }
   }
 }
+
+/*
+ 0 🔷|⚪|⚪|⚪|⚪|⚪|⚫|🔷|
+ 1 🔷|🔷|⚪|⚪|⚪|⚫|⚫|⚫|
+ 2 🔷|🔷|🔷|⚪|⚪|⚫|⚫|🔷|
+ 3 🔷|🔷|🔷|⚫|⚫|⚫|🔷|🔷|
+ 4 🔷|🔷|⚫|⚪|⚫|🔷|🔷|🔷|
+ 5 🔷|🔷|🔷|⚫|🔷|🔷|🔷|🔷|
+ 6 🔷|🔷|🔷|🔷|🔷|🔷|🔷|🔷|
+ 7 🔷|🔷|🔷|🔷|🔷|🔷|🔷|🔷|
+
+ >>> AI (White) trying to apply (2, 3)...
+ 0 🔷|⚪|⚪|⚪|⚪|⚪|⚫|🔷|
+ 1 🔷|🔷|⚪|⚪|⚪|⚫|⚫|⚫|
+ 2 🔷|🔷|🔷|⚪|⚪|⚫|⚫|🔷|
+ 3 🔷|🔷|⚪|⚪|⚪|⚫|🔷|🔷|
+ 4 🔷|🔷|⚫|⚪|⚫|🔷|🔷|🔷|
+ 5 🔷|🔷|🔷|⚫|🔷|🔷|🔷|🔷|
+ 6 🔷|🔷|🔷|🔷|🔷|🔷|🔷|🔷|
+ 7 🔷|🔷|🔷|🔷|🔷|🔷|🔷|🔷|
+ */

@@ -9,15 +9,33 @@ data class AIPlayer(override val piece: Piece) : Player {
     for (y in 0 until BOARD_SIZE) {
       for (x in 0 until BOARD_SIZE) {
         val affected = board.findAffectedPositions(piece, x, y)
+
         if (affected.isNotEmpty()) {
-          movesCandidates += Triple(x, y, affected.size)
+          val nextTriple = Triple(x, y, affected.size)
+
+          if (x == 2 && y == 3) {
+            println("next triple: $nextTriple")
+          }
+
+          movesCandidates += nextTriple
         }
       }
     }
 
-    if (movesCandidates.isEmpty()) return false
-    val (x, y, _) = movesCandidates.minBy { it.third }
-    println("AI trying to apply ($x, $y)...")
-    return board.applyMove(piece, x, y)
+    if (movesCandidates.isEmpty()) {
+      return false
+    } else {
+      val m = movesCandidates.minBy { it.third }
+      println(">>> AI ($piece) trying to apply (${m.first}, ${m.second})...")
+      val moved = board.applyMove(piece, m.first, m.second)
+
+      if (moved) {
+        println("Success")
+      } else {
+        "Didn't moved"
+      }
+
+      return moved
+    }
   }
 }
