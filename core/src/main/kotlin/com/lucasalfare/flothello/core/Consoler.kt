@@ -2,28 +2,29 @@ package com.lucasalfare.flothello.core
 
 import com.lucasalfare.flothello.core.game.Game
 import com.lucasalfare.flothello.core.game.GameState
+import com.lucasalfare.flothello.core.game.GameStatus
 
 fun main() {
   val bot1 = AIPlayer(Piece.Black)
   val bot2 = AIPlayer(bot1.piece.opposite())
   val board = Board()
   val gameState = GameState(board, 0)
-  val game = Game(gameState, listOf(bot1, bot2)) {
-    println(it)
+  val game = Game(gameState, listOf(bot1, bot2)) { state, scores ->
+    println(state.board, "\n", state.round, scores)
+    println()
   }
 
-  println(board)
+  println("Initial state: $gameState")
 
-  repeat(19) {
+  while (game.gameState.gameStatus == GameStatus.Playing) {
     game.step()
   }
 
-  // até o round "19" funciona, todas as jogadas dão certinhas, mas quando este próximo step, por algum motivo, ele joga White[2, 3]!
-  game.step()
+  println("Game finished!!!! ")
 }
 
-private fun clear() {
-  repeat(25) {
-    println("\n")
-  }
+// I created my own println() function implementation to accept multiple args in same call (multiple prints in same line). Why doesn't kotlin has this by default in stdlib?
+fun println(vararg items: Any) {
+  items.forEach { print("$it ") }
+  print("\n")
 }

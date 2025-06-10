@@ -91,7 +91,6 @@ class BoardTest {
   fun `deepCopy does not reset center`() {
     val board = Board()
     board.applyMove(Piece.White, 3, 2)
-    println(board)
     val copy = board.deepCopy()
     assertEquals(board.get(3, 3), copy.get(3, 3))
     assertNotEquals(Piece.Black, copy.get(3, 3))
