@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -30,9 +31,13 @@ class GameStateHolder(val game: Game) {
   var currentState by mutableStateOf(game.gameState)
     private set
 
+  var currentPlayer by mutableStateOf(game.currentPlayer)
+
   init {
     game.onChangeState = { state, scores ->
       currentState = state
+      currentPlayer = game.currentPlayer
+      println(state.gameStatus)
     }
   }
 }
@@ -41,7 +46,7 @@ fun main() = application {
   val p1 = HumanPlayer(Piece.Black)
   val p2 = AIPlayer(p1.piece.opposite())
   val board = Board()
-  val gameState = GameState(board, 0, p1)
+  val gameState = GameState(board, 0)
   val game = remember { Game(gameState, listOf(p1, p2)) }
   val stateHolder = remember { GameStateHolder(game) }
 
@@ -49,7 +54,12 @@ fun main() = application {
     state = WindowState(position = WindowPosition(Alignment.Center)),
     onCloseRequest = { exitApplication() }
   ) {
-    GameBoard(stateHolder)
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+      Column {
+        Text("Current player: ${stateHolder.currentPlayer.piece.sign}", color = Color.White)
+        GameBoard(stateHolder)
+      }
+    }
   }
 }
 
@@ -67,28 +77,24 @@ fun GameBoard(state: GameStateHolder) {
             piece = piece,
             isAffected = isAffected,
             onHover = {
-              val currentPlayer = state.currentState.currentPlayer
-              affected = state.currentState.board.findAffectedPositions(currentPlayer.piece, x, y)
+              val currentPlayer = state.game.currentPlayer
+              if (currentPlayer is HumanPlayer) {
+                affected = state.currentState.board.findAffectedPositions(currentPlayer.piece, x, y)
+              }
             },
             onExit = {
               affected = emptyList()
             },
             onClick = {
-              state.currentState.currentPlayer.let {
-                if (it is HumanPlayer) {
-                  it.targetCoordsDefiner = { x to y }
-                }
-
-                if (affected.isNotEmpty()) {
-                  state.game.step()
-                }
-
+              if (state.game.currentPlayer is HumanPlayer && affected.isNotEmpty()) {
+                (state.game.currentPlayer as HumanPlayer).targetCoordsDefiner = { x to y }
+                state.game.step()
                 affected = emptyList()
               }
             },
             onAnimationEnd = {
               affected = emptyList()
-              if (state.currentState.currentPlayer is AIPlayer) {
+              if (state.game.currentPlayer is AIPlayer) {
                 state.game.step()
               }
             }

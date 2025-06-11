@@ -13,28 +13,46 @@ class Game(
   val currentPlayer: Player
     get() = players[gameState.round % players.size]
 
-  private fun calculateScores(): List<Pair<Player, Int>> =
-    players.map { it to gameState.board.pieces.count { p -> p == it.piece } }
-
   fun step(): Boolean {
-    val validMoves = players.associateWith { gameState.board.getValidMoves(it.piece) }
-    val hasMoves = validMoves.any { it.value.isNotEmpty() }
-    val gameStatus = if (hasMoves) GameStatus.Playing else GameStatus.FinishedByNoMoves
+    if (gameState.gameStatus != GameStatus.Playing) return false
 
-    val boardCopy = gameState.board.deepCopy()
-    val moved = if (gameStatus == GameStatus.Playing) currentPlayer.doMove(boardCopy) else false
+    val moved = if (currentPlayer.hasValidMoves(gameState.board)) {
+      val boardCopy = gameState.board.deepCopy()
+      val moved = currentPlayer.doMove(boardCopy)
 
-    val nextRound = gameState.round + 1
-    val updatedBoard = if (moved) boardCopy else gameState.board
+      val nextBoard = if (moved) boardCopy else gameState.board
 
-    gameState = gameState.copy(
-      board = updatedBoard,
-      round = nextRound,
-      currentPlayer = players[nextRound % players.size],
-      gameStatus = gameStatus
-    )
+      gameState = gameState.copy(
+        board = nextBoard,
+        round = gameState.round + 1,
+        gameStatus = GameStatus.Playing
+      )
+      moved
+    } else {
+      if (players.any { it.hasValidMoves(gameState.board) }) {
+        println("${currentPlayer.piece} skipped its round.")
+        gameState = gameState.copy(
+          board = gameState.board,
+          round = gameState.round + 1,
+          gameStatus = GameStatus.Playing
+        )
+        false
+      } else {
+        println("Game over.")
+        gameState = gameState.copy(
+          board = gameState.board,
+          round = gameState.round,
+          gameStatus = GameStatus.FinishedByNoMoves
+        )
+
+        false
+      }
+    }
 
     onChangeState.invoke(gameState, calculateScores())
-    return moved
+    return moved;
   }
+
+  private fun calculateScores(): List<Pair<Player, Int>> =
+    players.map { it to gameState.board.pieces.count { p -> p == it.piece } }
 }

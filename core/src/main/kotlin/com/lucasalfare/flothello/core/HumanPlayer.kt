@@ -9,4 +9,8 @@ data class HumanPlayer(
     println(">>> Human ($piece) trying to apply ($x, $y)...")
     return board.applyMove(piece, x, y)
   }
+
+  override fun hasValidMoves(board: Board): Boolean {
+    return board.getValidMoves(piece).isNotEmpty()
+  }
 }
