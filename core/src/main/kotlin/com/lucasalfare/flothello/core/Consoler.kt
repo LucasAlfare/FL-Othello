@@ -8,7 +8,7 @@ fun main() {
   val bot1 = AIPlayer(Piece.Black)
   val bot2 = AIPlayer(bot1.piece.opposite())
   val board = Board()
-  val gameState = GameState(board, 0)
+  val gameState = GameState(board, 0, bot1)
   val game = Game(gameState, listOf(bot1, bot2)) { state, scores ->
     println(state.board, "\n", state.round, scores)
     println()

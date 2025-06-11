@@ -3,36 +3,38 @@ package com.lucasalfare.flothello.core.game
 import com.lucasalfare.flothello.core.Player
 
 class Game(
-  var gameState: GameState,
+  gameState: GameState,
   val players: List<Player>,
-  var onChangeState: (state: GameState, scores: MutableList<Pair<Player, Int>>) -> Unit = { _, _ -> }
+  var onChangeState: (state: GameState, scores: List<Pair<Player, Int>>) -> Unit = { _, _ -> }
 ) {
+  var gameState = gameState
+    private set
 
-  val currentPlayer get() = players[gameState.round % players.size]
+  val currentPlayer: Player
+    get() = players[gameState.round % players.size]
 
-  val scores
-    get(): MutableList<Pair<Player, Int>> {
-      val scores = mutableListOf<Pair<Player, Int>>()
-      players.forEach { p ->
-        scores += p to gameState.board.pieces.count { it == p.piece }
-      }
-      return scores
-    }
+  private fun calculateScores(): List<Pair<Player, Int>> =
+    players.map { it to gameState.board.pieces.count { p -> p == it.piece } }
 
   fun step(): Boolean {
-    // TODO: probably doesn't checks existence of valid moves for all players but this seems not affect the game flow1
-    val hasMoves = players.any { gameState.board.getValidMoves(it.piece).isNotEmpty() }
+    val validMoves = players.associateWith { gameState.board.getValidMoves(it.piece) }
+    val hasMoves = validMoves.any { it.value.isNotEmpty() }
     val gameStatus = if (hasMoves) GameStatus.Playing else GameStatus.FinishedByNoMoves
 
-    val nextBoard = gameState.board.deepCopy()
-    val moved = if (gameStatus == GameStatus.Playing) currentPlayer.doMove(nextBoard) else false
+    val boardCopy = gameState.board.deepCopy()
+    val moved = if (gameStatus == GameStatus.Playing) currentPlayer.doMove(boardCopy) else false
+
+    val nextRound = gameState.round + 1
+    val updatedBoard = if (moved) boardCopy else gameState.board
 
     gameState = gameState.copy(
-      board = if (moved) nextBoard else gameState.board,
-      round = gameState.round + 1,
+      board = updatedBoard,
+      round = nextRound,
+      currentPlayer = players[nextRound % players.size],
       gameStatus = gameStatus
     )
-    onChangeState.invoke(gameState, scores)
+
+    onChangeState.invoke(gameState, calculateScores())
     return moved
   }
 }
