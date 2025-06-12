@@ -4,10 +4,7 @@ package com.lucasalfare.flothello.core
 data class AIPlayer(override val piece: Piece) : Player {
   override fun doMove(board: Board): Boolean {
     val validMoves = board.getValidMoves(piece)
-    if (validMoves.isEmpty()) {
-      println("AI $piece has no slots available to play!")
-      return false
-    }
+    if (validMoves.isEmpty()) return false
 
     // TODO: pick a random choice instead of always the first "search with more captures"
     val move = validMoves.minByOrNull { board.findAffectedPositions(piece, it.first, it.second).size }

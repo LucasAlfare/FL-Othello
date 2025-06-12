@@ -1,58 +1,41 @@
 package com.lucasalfare.flothello.core.game
 
+import com.lucasalfare.flothello.core.Board
 import com.lucasalfare.flothello.core.Player
 
 class Game(
-  gameState: GameState,
-  val players: List<Player>,
-  var onChangeState: (state: GameState, scores: List<Pair<Player, Int>>) -> Unit = { _, _ -> }
+  private val player1: Player,
+  private val player2: Player,
+  initialState: State = State(board = Board(), currentPlayer = player1, round = 0),
+  var onStateUpdate: (State) -> Unit = {}
 ) {
-  var gameState = gameState
-    private set
 
-  val currentPlayer: Player
-    get() = players[gameState.round % players.size]
+  var state = initialState
+  var currentPlayer = initialState.currentPlayer
 
   fun step(): Boolean {
-    if (gameState.gameStatus != GameStatus.Playing) return false
+    if (state.status != Status.Playing) return false
 
-    val moved = if (currentPlayer.hasValidMoves(gameState.board)) {
-      val boardCopy = gameState.board.deepCopy()
-      val moved = currentPlayer.doMove(boardCopy)
+    val board = state.board
+    val nextPlayer = if (currentPlayer == player1) player2 else player1
 
-      val nextBoard = if (moved) boardCopy else gameState.board
+    when {
+      currentPlayer.hasValidMoves(board) && currentPlayer.doMove(board) -> {
+        currentPlayer = nextPlayer
+        state = state.copy(currentPlayer = currentPlayer, round = state.round + 1)
+      }
 
-      gameState = gameState.copy(
-        board = nextBoard,
-        round = gameState.round + 1,
-        gameStatus = GameStatus.Playing
-      )
-      moved
-    } else {
-      if (players.any { it.hasValidMoves(gameState.board) }) {
-        println("${currentPlayer.piece} skipped its round.")
-        gameState = gameState.copy(
-          board = gameState.board,
-          round = gameState.round + 1,
-          gameStatus = GameStatus.Playing
-        )
-        false
-      } else {
-        println("Game over.")
-        gameState = gameState.copy(
-          board = gameState.board,
-          round = gameState.round,
-          gameStatus = GameStatus.FinishedByNoMoves
-        )
+      !nextPlayer.hasValidMoves(board) -> {
+        state = state.copy(status = Status.FinishedByNoMoves)
+      }
 
-        false
+      else -> {
+        currentPlayer = nextPlayer
+        state = state.copy(currentPlayer = currentPlayer, round = state.round + 1)
       }
     }
 
-    onChangeState.invoke(gameState, calculateScores())
-    return moved;
+    onStateUpdate(state)
+    return state.status == Status.Playing
   }
-
-  private fun calculateScores(): List<Pair<Player, Int>> =
-    players.map { it to gameState.board.pieces.count { p -> p == it.piece } }
 }

@@ -1,24 +1,20 @@
 package com.lucasalfare.flothello.core
 
 import com.lucasalfare.flothello.core.game.Game
-import com.lucasalfare.flothello.core.game.GameState
-import com.lucasalfare.flothello.core.game.GameStatus
-import java.util.Scanner
+import com.lucasalfare.flothello.core.game.Status
+import java.util.*
 
 fun main() {
   val bot1 = AIPlayer(Piece.Black)
   val bot2 = AIPlayer(bot1.piece.opposite())
-  val board = Board()
-  val gameState = GameState(board, 0)
-  val game = Game(gameState, listOf(bot1, bot2)) { state, scores ->
-    println(state.gameStatus)
-    println()
+  val game = Game(bot1, bot2) {
+    println(it)
   }
 
-  println("Initial state: $gameState")
+  println("Initial state: ${game.state}")
 
-  while (game.gameState.gameStatus == GameStatus.Playing) {
-//    Scanner(System.`in`).nextLine()
+  while (game.state.status == Status.Playing) {
+    Scanner(System.`in`).nextLine()
     game.step()
   }
 

@@ -25,19 +25,19 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.lucasalfare.flothello.core.*
 import com.lucasalfare.flothello.core.game.Game
-import com.lucasalfare.flothello.core.game.GameState
+import com.lucasalfare.flothello.core.game.Status
 
 class GameStateHolder(val game: Game) {
-  var currentState by mutableStateOf(game.gameState)
+  var currentState by mutableStateOf(game.state)
     private set
 
   var currentPlayer by mutableStateOf(game.currentPlayer)
 
   init {
-    game.onChangeState = { state, scores ->
-      currentState = state
+    game.onStateUpdate = {
+      currentState = it
       currentPlayer = game.currentPlayer
-      println(state.gameStatus)
+      println(it.status)
     }
   }
 }
@@ -45,9 +45,7 @@ class GameStateHolder(val game: Game) {
 fun main() = application {
   val p1 = HumanPlayer(Piece.Black)
   val p2 = AIPlayer(p1.piece.opposite())
-  val board = Board()
-  val gameState = GameState(board, 0)
-  val game = remember { Game(gameState, listOf(p1, p2)) }
+  val game = remember { Game(p1, p2) }
   val stateHolder = remember { GameStateHolder(game) }
 
   Window(
@@ -56,7 +54,12 @@ fun main() = application {
   ) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
       Column {
-        Text("Current player: ${stateHolder.currentPlayer.piece.sign}", color = Color.White)
+        val s = when (stateHolder.currentState.status) {
+          Status.Playing -> "Make your move ${stateHolder.currentPlayer.piece.sign}!"
+          else -> "Game finished!"
+        }
+
+        Text(s)
         GameBoard(stateHolder)
       }
     }
