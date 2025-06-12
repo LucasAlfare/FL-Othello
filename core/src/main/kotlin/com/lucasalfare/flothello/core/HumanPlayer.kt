@@ -6,7 +6,6 @@ data class HumanPlayer(
 ) : Player {
   override fun doMove(board: Board): Boolean {
     val (x, y) = targetCoordsDefiner.invoke()
-    println(">>> Human ($piece) trying to apply ($x, $y)...")
     return board.applyMove(piece, x, y)
   }
 

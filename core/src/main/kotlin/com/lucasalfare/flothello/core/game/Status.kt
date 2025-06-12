@@ -1,5 +1,5 @@
 package com.lucasalfare.flothello.core.game
 
-enum class GameStatus {
+enum class Status {
   Playing, FinishedByNoMoves
 }

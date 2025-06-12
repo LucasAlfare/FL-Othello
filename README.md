@@ -32,3 +32,23 @@ graph TD
     K -->|Yes| L[Game ends.]
     K -->|No| B
 ```
+
+Other flow. I'll check it later:
+
+```mermaid
+graph TD
+    A[Início do step] --> B{Jogo está em Playing?}
+    B -->|Não| C[Retorna false<br>Jogo terminado]
+    B -->|Sim| D{Jogador atual<br>tem jogadas válidas?}
+    D -->|Sim| E[Tenta aplicar jogada<br>doMove]
+    E --> F{Jogada bem-sucedida?}
+    F -->|Sim| G[Avança round<br>Alterna jogador]
+    F -->|Não| H[Não altera jogador]
+    D -->|Não| I{Outro jogador<br>tem jogadas válidas?}
+    I -->|Sim| J[Passa vez para<br>outro jogador]
+    I -->|Não| K[Define status como<br>FinishedByNoMoves]
+    G --> L[Retorna true<br>Jogo continua]
+    H --> L
+    J --> L
+    K --> C
+```
