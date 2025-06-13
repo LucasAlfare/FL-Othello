@@ -1,8 +1,8 @@
 plugins {
+  alias(libs.plugins.androidApplication)
   alias(libs.plugins.kotlinMultiplatform)
   alias(libs.plugins.compose)
   alias(libs.plugins.composeCompiler)
-  alias(libs.plugins.androidLibrary)
 }
 
 repositories {
@@ -11,26 +11,22 @@ repositories {
 }
 
 kotlin {
-  jvm()
   androidTarget()
-
   sourceSets {
-    val commonMain by getting {
+    val androidMain by getting {
       dependencies {
         implementation(project(":core"))
+        implementation(project(":ui"))
         implementation(compose.ui)
         implementation(compose.foundation)
         implementation(compose.material)
+        implementation("androidx.activity:activity-compose:1.10.0")
       }
     }
   }
 }
 
 android {
-  namespace = "com.lucasalfare.flothello.android"
-  compileSdk = 34
-  defaultConfig {
-    minSdk = 24
-  }
-  sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+  namespace = "com.lucasalfare.flothello"
+  compileSdk = 33
 }
