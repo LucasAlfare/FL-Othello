@@ -1,6 +1,6 @@
 plugins {
-  alias(libs.plugins.kotlin.jvm) apply false
-  alias(libs.plugins.kotlin.multiplatform) apply false
-  alias(libs.plugins.jetbrains.compose) apply false
-  alias(libs.plugins.compose.compiler) apply false
+  alias(libs.plugins.kotlinJvm) apply false
+  alias(libs.plugins.kotlinMultiplatform) apply false
+  alias(libs.plugins.compose) apply false
+  alias(libs.plugins.composeCompiler) apply false
 }
