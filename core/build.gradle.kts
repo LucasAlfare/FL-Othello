@@ -1,12 +1,5 @@
 plugins {
-  kotlin("jvm") version "2.1.20"
-}
-
-group = "com.lucasalfare"
-version = "1.0-SNAPSHOT"
-
-repositories {
-  mavenCentral()
+  alias(libs.plugins.kotlin.jvm)
 }
 
 dependencies {
@@ -16,6 +9,7 @@ dependencies {
 tasks.test {
   useJUnitPlatform()
 }
+
 kotlin {
   jvmToolchain(21)
 }

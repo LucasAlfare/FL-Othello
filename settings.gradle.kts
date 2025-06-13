@@ -3,4 +3,12 @@ plugins {
 }
 rootProject.name = "FL-Othello"
 
-include(":core", ":desktop")
+include(":core", ":ui", ":desktop")
+
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral()
+    google()
+    maven { url = uri("https://plugins.gradle.org/m2/") }
+  }
+}
