@@ -1,14 +1,15 @@
-plugins {
-  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
-}
 rootProject.name = "FL-Othello"
 
-include(":core", ":ui", ":desktop")
+include(":core", ":ui", ":desktop", ":android")
 
-dependencyResolutionManagement {
+pluginManagement {
   repositories {
-    mavenCentral()
+    gradlePluginPortal()
     google()
-    maven { url = uri("https://plugins.gradle.org/m2/") }
+    mavenCentral()
   }
+}
+
+plugins {
+  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }

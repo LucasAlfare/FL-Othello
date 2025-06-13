@@ -2,6 +2,10 @@ plugins {
   alias(libs.plugins.kotlinJvm)
 }
 
+repositories {
+  mavenCentral()
+}
+
 dependencies {
   testImplementation(kotlin("test"))
 }

@@ -4,6 +4,12 @@ plugins {
   alias(libs.plugins.composeCompiler)
 }
 
+repositories {
+  mavenCentral()
+  maven { url = uri("https://plugins.gradle.org/m2/") }
+  google()
+}
+
 dependencies {
   implementation(project(":core"))
   implementation(project(":ui"))

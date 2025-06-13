@@ -1,9 +1,12 @@
 [versions]
 kotlin = "2.1.10"
 compose = "1.7.3"
+android = "8.8.0"
 
 [plugins]
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+androidApplication = { id = "com.android.application", version.ref = "android" }
+androidLibrary = { id = "com.android.library", version.ref = "android" }
