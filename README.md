@@ -31,3 +31,13 @@ graph TD
     G --> L[Return true]
     L --> A
 ```
+
+We really expect that UI always send valid coords to avoid automatically skips current player if he "clicks" at a invalid coord, as described in this part:
+
+```mermaid
+graph TD
+    E[Attempt move] --> F{Move valid?}
+    F -->|Yes| I{Enemy has moves?}
+    F -->|No| G{"Bad change player<br>(we don't want<br>automatically)"}
+    I -->|Yes| J{"Good change"}
+```
