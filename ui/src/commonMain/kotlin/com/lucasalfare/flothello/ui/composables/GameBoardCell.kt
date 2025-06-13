@@ -35,7 +35,7 @@ fun GameBoardCell(
     else -> null
   }
 
-  val affectedColor = if (isAffected) Color(0xFF8899cc) else Color(0xFF1bb380)
+  val affectedColor = if (isAffected) Color.Blue else Color(0xFF1bb380)
 
   val scale = remember { Animatable(0f) }
 

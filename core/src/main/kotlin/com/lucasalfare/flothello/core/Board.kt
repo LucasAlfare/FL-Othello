@@ -93,6 +93,16 @@ data class Board(val pieces: Array<Piece> = Array(BOARD_SIZE * BOARD_SIZE) { Pie
     return emptyList()
   }
 
+  fun countPieces(): Map<Piece, Int> {
+    val counts = mutableMapOf(Piece.Black to 0, Piece.White to 0)
+    pieces.forEach {
+      if (it != Piece.Empty && it != Piece.Invalid) {
+        counts[it] = counts.getValue(it) + 1
+      }
+    }
+    return counts
+  }
+
   fun get(x: Int, y: Int): Piece {
     if (!inBounds(x, y)) return Piece.Invalid
     return pieces[x + y * BOARD_SIZE]
