@@ -9,7 +9,6 @@ class Game(
   initialState: State = State(board = Board(), currentPlayer = player1, round = 0),
   var onStateUpdate: (State) -> Unit = {}
 ) {
-
   var state = initialState
   var currentPlayer = initialState.currentPlayer
 
@@ -17,24 +16,26 @@ class Game(
     if (state.status != Status.Playing) return false
 
     val board = state.board
-    val nextPlayer = if (currentPlayer == player1) player2 else player1
+    val mover = currentPlayer
+    val opponent = if (mover == player1) player2 else player1
 
-    when {
-      currentPlayer.hasValidMoves(board) && currentPlayer.doMove(board) -> {
-        currentPlayer = nextPlayer
-        state = state.copy(currentPlayer = currentPlayer, round = state.round + 1)
+    val nextPlayer = when {
+      mover.hasValidMoves(board) && mover.doMove(board) -> when {
+        opponent.hasValidMoves(board) -> opponent
+        mover.hasValidMoves(board) -> mover
+        else -> null
       }
 
-      !nextPlayer.hasValidMoves(board) -> {
-        state = state.copy(status = Status.FinishedByNoMoves)
-      }
-
-      else -> {
-        currentPlayer = nextPlayer
-        state = state.copy(currentPlayer = currentPlayer, round = state.round + 1)
-      }
+      !mover.hasValidMoves(board) && opponent.hasValidMoves(board) -> opponent
+      else -> null
     }
 
+    state = when (nextPlayer) {
+      null -> state.copy(status = Status.FinishedByNoMoves, round = state.round + 1)
+      else -> state.copy(currentPlayer = nextPlayer, round = state.round + 1)
+    }
+
+    currentPlayer = state.currentPlayer
     onStateUpdate(state)
     return state.status == Status.Playing
   }
