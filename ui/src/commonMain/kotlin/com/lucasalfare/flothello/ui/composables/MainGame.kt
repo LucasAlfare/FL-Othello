@@ -6,14 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.lucasalfare.flothello.ui.state.UIStateHolder
+import com.lucasalfare.flothello.ui.state.GameStateHolder
 
 @Composable
-fun MainGame(stateHolder: UIStateHolder) {
-  Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-    Column {
-      ScoreBoard(stateHolder.currentState)
-      GameBoard(stateHolder)
-    }
+fun MainGame(stateHolder: GameStateHolder) {
+  Column {
+    ScoreBoard(stateHolder.currentState)
+    GameBoard(stateHolder)
   }
 }

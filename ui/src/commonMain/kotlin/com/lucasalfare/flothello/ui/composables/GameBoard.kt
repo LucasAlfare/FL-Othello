@@ -11,10 +11,10 @@ import androidx.compose.ui.unit.dp
 import com.lucasalfare.flothello.core.AIPlayer
 import com.lucasalfare.flothello.core.BOARD_SIZE
 import com.lucasalfare.flothello.core.HumanPlayer
-import com.lucasalfare.flothello.ui.state.UIStateHolder
+import com.lucasalfare.flothello.ui.state.GameStateHolder
 
 @Composable
-fun GameBoard(state: UIStateHolder) {
+fun GameBoard(state: GameStateHolder) {
   var affected by remember { mutableStateOf<List<Pair<Int, Int>>>(emptyList()) }
 
   Column(modifier = Modifier.padding(4.dp).background(Color.DarkGray)) {

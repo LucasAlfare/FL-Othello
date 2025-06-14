@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.lucasalfare.flothello.core.game.Game
 
-class UIStateHolder(val game: Game) {
+class GameStateHolder(val game: Game) {
   var currentState by mutableStateOf(game.state)
     private set
 
@@ -15,7 +15,6 @@ class UIStateHolder(val game: Game) {
     game.onStateUpdate = {
       currentState = it
       currentPlayer = game.currentPlayer
-      println(it.status)
     }
   }
 }

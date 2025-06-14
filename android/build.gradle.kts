@@ -6,6 +6,7 @@ plugins {
 }
 
 repositories {
+  google()
   mavenCentral()
   maven { url = uri("https://plugins.gradle.org/m2/") }
 }
@@ -20,7 +21,7 @@ kotlin {
         implementation(compose.ui)
         implementation(compose.foundation)
         implementation(compose.material)
-        implementation("androidx.activity:activity-compose:1.10.0")
+        implementation("androidx.activity:activity-compose:1.10.1")
       }
     }
   }
@@ -28,5 +29,5 @@ kotlin {
 
 android {
   namespace = "com.lucasalfare.flothello"
-  compileSdk = 33
+  compileSdk = 35
 }
