@@ -6,6 +6,7 @@ plugins {
 }
 
 repositories {
+  google()
   mavenCentral()
   maven { url = uri("https://plugins.gradle.org/m2/") }
 }
@@ -23,6 +24,15 @@ kotlin {
         implementation(compose.material)
       }
     }
+    val jvmMain by getting
+    val androidMain by getting {
+      dependencies {
+        implementation(project(":core"))
+        implementation(compose.ui)
+        implementation(compose.foundation)
+        implementation(compose.material)
+      }
+    }
   }
 }
 
@@ -32,5 +42,5 @@ android {
   defaultConfig {
     minSdk = 24
   }
-  sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//  sourceSets["main"].manifest.srcFile("src/main/java/AndroidManifest.xml")
 }

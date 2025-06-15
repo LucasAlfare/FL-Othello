@@ -8,6 +8,8 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 // @formatter:off
 @OptIn(ExperimentalComposeUiApi::class)
 actual fun Modifier.hoverEffect(onHover: () -> Unit, onExit: () -> Unit): Modifier =
-  onPointerEvent(PointerEventType.Enter) { onHover() }
-    .onPointerEvent(PointerEventType.Exit) { onExit() }
+  this.then(
+    onPointerEvent(PointerEventType.Enter) { onHover() }
+      .onPointerEvent(PointerEventType.Exit) { onExit() }
+  )
 // @formatter:off
