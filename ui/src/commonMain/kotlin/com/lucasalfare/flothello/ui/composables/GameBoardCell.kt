@@ -18,24 +18,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.lucasalfare.flothello.core.AIPlayer
 import com.lucasalfare.flothello.core.Piece
+import com.lucasalfare.flothello.ui.modifiers.inputController
+import com.lucasalfare.flothello.ui.state.GameStateHolder
 
 @Composable
 fun GameBoardCell(
-  piece: Piece,
-  isAffected: Boolean = false,
-  onHover: () -> Unit = {},
-  onExit: () -> Unit = {},
-  onClick: () -> Unit = {},
-  onAnimationEnd: () -> Unit = {}
+  coord: Pair<Int, Int>,
+  stateHolder: GameStateHolder
 ) {
+  val piece = stateHolder.currentState.board.get(coord.first, coord.second)
+  val isAffected = coord in stateHolder.affected
+  val affectedColor = if (isAffected) Color.Blue else Color(0xFF1bb380)
+
   val discColor = when (piece) {
     Piece.Black -> Color.Black
     Piece.White -> Color.White
     else -> null
   }
-
-  val affectedColor = if (isAffected) Color.Blue else Color(0xFF1bb380)
 
   val scale = remember { Animatable(0f) }
 
@@ -46,18 +47,20 @@ fun GameBoardCell(
         targetValue = 1f,
         animationSpec = tween(durationMillis = 100)
       )
-      onAnimationEnd()
+      stateHolder.affected = emptyList()
+      if (stateHolder.game.currentPlayer is AIPlayer) {
+        stateHolder.game.step()
+      }
     }
   }
 
   Box(
     modifier = Modifier
       .size(40.dp)
-      .hoverEffect(onHover = { onHover() }, onExit = { onExit() })
+      .inputController(stateHolder, coord)
       .border(1.dp, Color(0xFF636363), RoundedCornerShape(4.dp))
       .padding(1.dp)
-      .background(affectedColor)
-      .clickable { onClick() },
+      .background(affectedColor),
     contentAlignment = Alignment.Center
   ) {
     if (discColor != null) {
