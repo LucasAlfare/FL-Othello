@@ -1,12 +1,9 @@
 package com.lucasalfare.flothello.ui.state
 
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.lucasalfare.flothello.core.HumanPlayer
 import com.lucasalfare.flothello.core.game.Game
-import com.lucasalfare.flothello.core.game.State
 
 class GameStateHolder(val game: Game) {
   var hoverCoord by mutableStateOf<Pair<Int, Int>?>(null)
